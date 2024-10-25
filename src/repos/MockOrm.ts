@@ -1,38 +1,39 @@
-
-
 import jsonfile from 'jsonfile';
+import path from 'path'; // Импортируем модуль path
 
 import { IUser } from '@src/models/User';
-
+import { ExampleType } from '@src/models/Example';
 
 // **** Variables **** //
 
 const DB_FILE_NAME = 'database.json';
 
-
 // **** Types **** //
 
 interface IDb {
   users: IUser[];
+  examples: ExampleType[];
 }
-
 
 // **** Functions **** //
 
 /**
- * Fetch the json from the file.
+ * Fetch the JSON data from the file.
  */
 function openDb(): Promise<IDb> {
-  return jsonfile.readFile(__dirname + '/' + DB_FILE_NAME) as Promise<IDb>;
+  // Используем path.join для создания правильного пути к файлу
+  const dbPath = path.join(__dirname, DB_FILE_NAME);
+  return jsonfile.readFile(dbPath) as Promise<IDb>;
 }
 
 /**
- * Update the file.
+ * Update the JSON file.
  */
 function saveDb(db: IDb): Promise<void> {
-  return jsonfile.writeFile((__dirname + '/' + DB_FILE_NAME), db);
+  // Используем тот же путь для записи
+  const dbPath = path.join(__dirname, DB_FILE_NAME);
+  return jsonfile.writeFile(dbPath, db);
 }
-
 
 // **** Export default **** //
 

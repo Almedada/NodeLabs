@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import express, { Request, Response, NextFunction } from 'express';
 import logger from 'jet-logger';
 
+
 import 'express-async-errors';
 
 import BaseRouter from '@src/routes';
@@ -14,6 +15,7 @@ import EnvVars from '@src/common/EnvVars';
 import HttpStatusCodes from '@src/common/HttpStatusCodes';
 import { RouteError } from '@src/common/classes';
 import { NodeEnvs } from '@src/common/misc';
+import ExampleService from '@src/services/ExampleService';
 
 
 // **** Variables **** //
@@ -25,7 +27,7 @@ const app = express();
 
 // Basic middleware
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(EnvVars.CookieProps.Secret));
 
 // Show routes called in console during development
@@ -65,10 +67,25 @@ app.set('views', viewsDir);
 const staticDir = path.join(__dirname, 'public');
 app.use(express.static(staticDir));
 
-// Nav to users pg by default
+// Nav to examples page by default
 app.get('/', (_: Request, res: Response) => {
-  return res.redirect('/users');
+  return res.redirect('/examples');
 });
+
+// Get all examples
+
+app.get('/examples', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const examples = await ExampleService.getAll();
+    res.json(examples);
+  } catch (error) {
+    console.error('Error fetching examples:', error); // Более подробный вывод ошибки
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
 
 // Redirect to login if not logged in.
 app.get('/users', (_: Request, res: Response) => {
